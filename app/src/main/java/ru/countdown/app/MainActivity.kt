@@ -71,8 +71,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() { unregisterReceiver(events); super.onDestroy() }
 
-    private fun startTimer(hours: Int, minutes: Int) {
-        val duration = (hours * 60L + minutes) * 60_000L
+    private fun startTimer(hours: Int, minutes: Int, seconds: Int) {
+        val duration = (hours * 3_600L + minutes * 60L + seconds) * 1_000L
         if (duration <= 0) return
         remainingMs = duration
         running = true
@@ -93,8 +93,9 @@ class MainActivity : ComponentActivity() {
     private fun CountdownScreen() {
         var hours by remember { mutableStateOf(0) }
         var minutes by remember { mutableStateOf(30) }
+        var seconds by remember { mutableStateOf(0) }
         val isAdmin = getSystemService(DevicePolicyManager::class.java).isAdminActive(ComponentName(this, SleepDeviceAdminReceiver::class.java))
-        val shown = if (running) SleepTimerService.format(remainingMs) else String.format("%02d:%02d:00", hours, minutes)
+        val shown = if (running) SleepTimerService.format(remainingMs) else String.format("%02d:%02d:%02d", hours, minutes, seconds)
         Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF10111A)) {
             Column(Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 Text("COUNTDOWN", color = Color(0xFFA9AAFF), fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 3.sp)
@@ -104,10 +105,14 @@ class MainActivity : ComponentActivity() {
                 Text(shown, color = Color.White, fontSize = 64.sp, fontWeight = FontWeight.Light)
                 if (!running) {
                     Spacer(Modifier.height(24.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        NumberButton("−") { if (minutes > 0) minutes-- else if (hours > 0) { hours--; minutes = 59 } }
-                        Text("  ${hours}ч ${minutes}м  ", color = Color(0xFFBFC0CE), fontSize = 18.sp)
-                        NumberButton("+") { if (minutes == 59) { hours++; minutes = 0 } else minutes++ }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TimeUnitControl("Часы", hours, 0..99) { hours = (hours + it).coerceIn(0, 99) }
+                        TimeUnitControl("Минуты", minutes, 0..59) { minutes = (minutes + it).coerceIn(0, 59) }
+                        TimeUnitControl("Секунды", seconds, 0..59) { seconds = (seconds + it).coerceIn(0, 59) }
                     }
                 }
                 Spacer(Modifier.height(42.dp))
@@ -115,7 +120,7 @@ class MainActivity : ComponentActivity() {
                     OutlinedButton(onClick = ::requestAdmin, modifier = Modifier.fillMaxWidth()) { Text("Разрешить блокировку экрана") }
                     Spacer(Modifier.height(12.dp))
                 }
-                Button(onClick = { if (running) cancelTimer() else startTimer(hours, minutes) }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6869F2))) {
+                Button(onClick = { if (running) cancelTimer() else startTimer(hours, minutes, seconds) }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6869F2))) {
                     Text(if (running) "Остановить таймер" else "Запустить таймер", fontSize = 17.sp)
                 }
                 if (running) TextButton(onClick = ::cancelTimer) { Text("Сбросить", color = Color(0xFFBFC0CE)) }
@@ -127,6 +132,16 @@ class MainActivity : ComponentActivity() {
 
     @androidx.compose.runtime.Composable
     private fun NumberButton(label: String, onClick: () -> Unit) { TextButton(onClick = onClick) { Text(label, color = Color.White, fontSize = 28.sp) } }
+
+    @androidx.compose.runtime.Composable
+    private fun TimeUnitControl(label: String, value: Int, range: IntRange, onChange: (Int) -> Unit) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(label, color = Color(0xFF8D8E9E), fontSize = 13.sp)
+            NumberButton("+") { if (value < range.last) onChange(1) }
+            Text(String.format("%02d", value), color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Medium)
+            NumberButton("−") { if (value > range.first) onChange(-1) }
+        }
+    }
 }
 
 @androidx.compose.runtime.Composable
