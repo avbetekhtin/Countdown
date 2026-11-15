@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Countdown</string>
+    <string name="device_admin_description">Разрешение нужно, чтобы заблокировать экран после завершения таймера.</string>
+</resources>
