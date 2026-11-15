@@ -94,14 +94,14 @@ class MainActivity : ComponentActivity() {
         var hours by remember { mutableStateOf(0) }
         var minutes by remember { mutableStateOf(30) }
         val isAdmin = getSystemService(DevicePolicyManager::class.java).isAdminActive(ComponentName(this, SleepDeviceAdminReceiver::class.java))
-        val shown = if (running) SleepTimerService.format(remainingMs) else String.format("%02d:%02d", hours, minutes)
+        val shown = if (running) SleepTimerService.format(remainingMs) else String.format("%02d:%02d:00", hours, minutes)
         Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF10111A)) {
             Column(Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 Text("COUNTDOWN", color = Color(0xFFA9AAFF), fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 3.sp)
                 Spacer(Modifier.height(20.dp))
                 Text("Таймер сна", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(44.dp))
-                Text(shown, color = Color.White, fontSize = 72.sp, fontWeight = FontWeight.Light)
+                Text(shown, color = Color.White, fontSize = 64.sp, fontWeight = FontWeight.Light)
                 if (!running) {
                     Spacer(Modifier.height(24.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {

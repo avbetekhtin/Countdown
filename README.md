@@ -4,7 +4,7 @@ Android sleep timer built with Kotlin and Jetpack Compose.
 
 ## What it does
 
-- Counts down hours and minutes from a foreground service.
+- Counts down hours, minutes, and seconds from a foreground service.
 - Keeps the timer alive when the app is in the background.
 - Shows the remaining time in a persistent notification.
 - Requests Android Device Administrator access and locks the device when the timer ends.

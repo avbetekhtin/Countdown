@@ -104,8 +104,12 @@ class SleepTimerService : Service() {
         private const val NOTIFICATION_ID = 1001
 
         fun format(ms: Long): String {
-            val totalMinutes = (ms.coerceAtLeast(0) / 60_000)
-            return String.format(Locale.getDefault(), "%02d:%02d", totalMinutes / 60, totalMinutes % 60)
+            // Round up so a running timer never displays 00:00:00 before it finishes.
+            val totalSeconds = (ms.coerceAtLeast(0) + 999) / 1_000
+            val hours = totalSeconds / 3_600
+            val minutes = (totalSeconds % 3_600) / 60
+            val seconds = totalSeconds % 60
+            return String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds)
         }
     }
 }
