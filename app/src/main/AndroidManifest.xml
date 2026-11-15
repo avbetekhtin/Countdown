@@ -5,6 +5,8 @@
 
     <application
         android:allowBackup="true"
+        android:icon="@drawable/countdown_logo_android"
+        android:roundIcon="@drawable/countdown_logo_android"
         android:label="Countdown"
         android:theme="@style/Theme.Countdown">
         <activity
